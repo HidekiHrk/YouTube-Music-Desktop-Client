@@ -1,0 +1,21 @@
+{
+  "name": "yt_msc",
+  "version": "0.0.1",
+  "description": "",
+  "main": "main.js",
+  "productName": "YouTube Music",
+  "scripts": {
+    "start": "electron . --enable-transparent-visuals --disable-gpu"
+  },
+  "author": "Hideki",
+  "license": "ISC",
+  "devDependencies": {
+    "discord-rpc": "^3.0.1",
+    "electron": "^3.0.4",
+    "electron-packager": "^12.2.0"
+  },
+  "dependencies": {
+    "discord-rpc": "^3.0.1",
+    "ytdl-core": "^0.26.1"
+  }
+}

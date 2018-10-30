@@ -1,12 +1,15 @@
 const { app, BrowserWindow, Notification, NativeImage, Tray, ipcMain } = require('electron');
-const pckg = require('./package.json')
-const config = require('./config.json')
+const ytdl = require('ytdl-core');
 const RPC = require('discord-rpc');
 const client = new RPC.Client({ transport: 'ipc' })
+const config = require('./config.json');
+var startTimestamp = new Date();
 var clientid = config.clientId;
-const startTimestamp = new Date()
+const pckg = require('./package.json')
 
-// Create Window Function //
+
+// Window App //
+
 function createWindow(){
 	win = new BrowserWindow({width:800, height:500, minWidth:400, minHeight:250, icon:`${__dirname}/img/ico.png`, transparent: true, frame:false, resizable:true});
 	win.setMenu(null);
@@ -44,21 +47,16 @@ app.on('activate', () =>{
 	};
 })
 
-// Conversation to Renderer //
+// Discord RPC Connection //
 
-ipcMain.on('request-mainprocess-action', (event, arg) => {
-	switch(arg.name){
-		case 'activity':
-			client.setActivity(arg.value)
-				.catch(console.error);
-			break;
-	}
+ipcMain.on('activity', (event, arg) => {
+	client.setActivity(arg).catch(console.error)
 })
 
-
-// RPC Client //
 client.on('ready', () => {
-	isReady = true
+	win.webContents.on('did-finish-load', () =>{
+		win.webContents.send('ready', true)
+	})
 	client.setActivity({
 		details:'Just idling...',
 		state:'and making some stuff',
@@ -66,7 +64,7 @@ client.on('ready', () => {
 		largeImageKey:config.idle,
 		largeImageText: `YouTube Music v${pckg.version}`,
 		instance: false,
-	}).catch(console.error)
+	}).catch(console.error);
 });
 
 function rpc_connect_notifi(fail){
@@ -83,7 +81,7 @@ function rpc_connect_notifi(fail){
 		not.show()
 		setTimeout(() => {
 			not.close();
-		}, segs * 1000)	
+		}, segs * 1000)
 	}
 }
 

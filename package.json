@@ -1,12 +1,12 @@
 {
   "name": "yt_msc",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "",
   "main": "main.js",
   "productName": "YouTube Music",
   "scripts": {
-    "test": "electron .",
-    "start": "electron-packager . --out=build --icon=./icon.ico"
+    "start": "electron . --enable-transparent-visuals --disable-gpu",
+    "test": "electron-packager . --icon=./img/icon.ico"
   },
   "author": "Hideki",
   "license": "ISC",

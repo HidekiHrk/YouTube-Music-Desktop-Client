@@ -1,3 +1,3 @@
 # YouTube Music Desktop Client
-[![Version](https://img.shields.io/badge/version-0.0.2-blue.svg?style=flat-square)](https://github.com/HidekiHrk/YouTube-Music-Desktop-Client/releases/tag/v0.0.2)<br>
+[![Version](https://img.shields.io/badge/version-0.0.2-blue.svg?style=flat-square)](https://github.com/HidekiHrk/YouTube-Music-Desktop-Client/releases/tag/v0.0.2) ![Stars](https://img.shields.io/github/stars/HidekiHrk/YouTube-Music-Desktop-Client.svg) ![Forks](https://img.shields.io/github/forks/HidekiHrk/YouTube-Music-Desktop-Client.svg)<br>
 An YouTube Music Client for desktop

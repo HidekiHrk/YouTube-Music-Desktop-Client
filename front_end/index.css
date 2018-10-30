@@ -122,3 +122,6 @@ img.butoes {
 .botoes:hover > img.butoes {
 	filter: brightness(0.2);
 }
+.botoes:hover {
+	cursor: pointer;
+}

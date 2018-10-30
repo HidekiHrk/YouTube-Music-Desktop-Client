@@ -21,7 +21,6 @@ tray.on('click', () => {
 	remote.getCurrentWindow().show();
 })
 
-
 // Globals //
 
 var in_search = false;
@@ -30,9 +29,9 @@ var is_playing = false;
 
 // Functions //
 
-function decode(str, idx){
+/*function decode(str, idx){
 	return String.fromCharCode(str.charCodeAt(idx));
-}
+}*/
 
 function video_info(url, title, author) {
 	this.url = url;
@@ -42,6 +41,20 @@ function video_info(url, title, author) {
 
 function setActivity(obj){
 	ipcRenderer.send('activity', obj);
+}
+
+function notify(obj, timeout=5) {
+	try{
+		let not = new remote.Notification(obj);
+		not.show()
+		setTimeout(() => {
+			not.close();
+		}, timeout * 1000);
+	catch(e){}
+	try{		
+		tray.displayBalloon({title:obj.title, content:obj.body, icon:obj.icon});
+	}
+	catch(e){}
 }
 
 // ipcEvents //
@@ -67,11 +80,7 @@ webview.addEventListener('media-started-playing', () =>{
 		if(is_playing){
 			is_playing = false
 			let newTimeStamp = new Date()
-			let playNotifi = new remote.Notification({title:pkg.productName, body:`\u{1F3B5} ${currentPlaying.title}\n\u{1F464} ${currentPlaying.author}`, icon:previousPath + '/img/ico.png'})
-			playNotifi.show()
-			setTimeout(() => {
-				playNotifi.close();
-			}, 5000)
+			notify({title:pkg.productName, body:`\u{1F3B5} ${currentPlaying.title}\n\u{1F464} ${currentPlaying.author}`, icon:previousPath + '/img/ico.png'})
 			tray.setToolTip(`Playing - Music: ${currentPlaying.title} - ${currentPlaying.author}`)
 			tray.setImage(previousPath + '/img/ico.png')
 			setActivity({

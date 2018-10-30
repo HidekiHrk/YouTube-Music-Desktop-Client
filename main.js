@@ -1,11 +1,11 @@
-const { app, BrowserWindow, Notification } = require('electron');
+const { app, BrowserWindow, Notification, NativeImage, Tray } = require('electron');
 const pckg = require('./package.json')
 
 function createWindow(){
-	win = new BrowserWindow({width:800, height:500, icon:`${__dirname}/img/ico.png`, transparent: true, frame:false, resizable:true});
+	win = new BrowserWindow({width:800, height:500, minWidth:400, minHeight:250, icon:`${__dirname}/img/ico.png`, transparent: true, frame:false, resizable:true});
 	win.setMenu(null);
 	win.loadFile(`${__dirname}/front_end/index.html`);
-	win.openDevTools()
+	//win.openDevTools()
 	win.on('closed', () => {
 		win = null;
 	})

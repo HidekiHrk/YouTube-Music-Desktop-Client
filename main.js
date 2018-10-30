@@ -18,7 +18,7 @@ function createWindow(){
 	win.on('closed', () => {
 		win = null;
 	})
-	notifi = new Notification({title:`${pckg.productName}`, body:`Welcome to ${pckg.productName} v${pckg.version}!`, icon:'./img/ico.png'});
+	notifi = new Notification({title:`${pckg.productName}`, body:`Welcome to ${pckg.productName} v${pckg.version}!`, icon:`${__dirname}/img/ico.png`});
 	notifi.show()
 	notifi.on('show', () => {
 		try{
@@ -69,7 +69,7 @@ client.on('ready', () => {
 
 function rpc_connect_notifi(fail){
 	if(!fail){
-		let not2 = new Notification({title:pckg.productName, body:'Successfully connected to Discord RPC!', icon:'./img/Discord-Logo-Color.png'})
+		let not2 = new Notification({title:pckg.productName, body:'Successfully connected to Discord RPC!', icon:__dirname + '/img/Discord-Logo-Color.png'})
 		not2.show()
 		setTimeout(() => {
 			not2.close()
@@ -77,7 +77,7 @@ function rpc_connect_notifi(fail){
 	}
 	else{
 		let segs = 5;
-		let not = new Notification({title:pckg.productName, body:'Failed to connect to Discord RPC', body:`Attempting to connect in ${segs}s...`, icon:'./img/Discord-Logo-Color.png'})
+		let not = new Notification({title:pckg.productName, body:'Failed to connect to Discord RPC', body:`Attempting to connect in ${segs}s...`, icon: __dirname + '/img/Discord-Logo-Color.png'})
 		not.show()
 		setTimeout(() => {
 			not.close();

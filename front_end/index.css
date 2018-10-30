@@ -17,6 +17,19 @@ body {
 	src: url('./fonts/Futura_Light.ttf');
 }
 
+div#back {
+	background-color: #131313;
+	border-radius: 8px;
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	padding: 0;
+	margin: 0;
+	top:0;
+	left:0;
+	z-index: -1;
+}
+
 p#ytmsc_title {
 	color: white;
 	font-family: 'Futura_Light';

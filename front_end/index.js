@@ -2,9 +2,11 @@ const { remote, ipcRenderer } = require('electron');
 const fs = require('fs');
 const ytdl = require('ytdl-core');
 const RPC = require('discord-rpc');
+const path = require('path');
 const client = new RPC.Client({ transport: 'ipc' })
-const config = require('../config.json');
-const pkg = require('../package.json')
+var previousPath = __dirname.slice(0, __dirname.length - __dirname.split(path.sep).pop().length)
+const config = require(previousPath + '/config.json');
+const pkg = require(previousPath + '/package.json')
 const startTimestamp = new Date()
 var clientid = config.clientId;
 var isReady = false;
@@ -13,7 +15,7 @@ var webView = document.getElementById('webview');
 
 // Icon in Task Bar //
 
-var tray = new remote.Tray('./img/icon2.png');
+var tray = new remote.Tray(previousPath + '/img/icon2.png');
 tray.setToolTip('Idling...');
 tray.on('click', () => {
 	remote.getCurrentWindow().show();
@@ -65,13 +67,13 @@ webview.addEventListener('media-started-playing', () =>{
 		if(is_playing){
 			is_playing = false
 			let newTimeStamp = new Date()
-			let playNotifi = new remote.Notification({title:pkg.productName, body:`\u{1F3B5} ${currentPlaying.title}\n\u{1F464} ${currentPlaying.author}`, icon:'./img/ico.png'})
+			let playNotifi = new remote.Notification({title:pkg.productName, body:`\u{1F3B5} ${currentPlaying.title}\n\u{1F464} ${currentPlaying.author}`, icon:previousPath + '/img/ico.png'})
 			playNotifi.show()
 			setTimeout(() => {
 				playNotifi.close();
 			}, 5000)
 			tray.setToolTip(`Playing - Music: ${currentPlaying.title} - ${currentPlaying.author}`)
-			tray.setImage('./img/ico.png')
+			tray.setImage(previousPath + '/img/ico.png')
 			setActivity({
 				details:`\u{1F3B5} ${currentPlaying.title}`,
 				state:`\u{1F464} ${currentPlaying.author}`,
@@ -91,7 +93,7 @@ webview.addEventListener('media-paused', () => {
 	is_playing = true;
 	let newTimeStamp = new Date()
 	tray.setToolTip(`Paused - Music: ${currentPlaying.title} - ${currentPlaying.author}`)
-	tray.setImage('./img/ico.png')
+	tray.setImage(previousPath + '/img/ico.png')
 	setActivity({
 		details:`\u{1F3B5} ${currentPlaying.title}`,
 		state:`\u{1F464} ${currentPlaying.author}`,
@@ -119,7 +121,7 @@ webview.addEventListener('did-stop-loading', () => {
 		in_search = true;
 		let srch_qry = decodeURI(url.slice('https://music.youtube.com/search?q='.length, url.length)).replace(/\+/g, ' ');
 		tray.setToolTip(`Searching: ${srch_qry}`)
-		tray.setImage('./img/icon2.png')
+		tray.setImage(previousPath + '/img/icon2.png')
 		setActivity({
 			details:'Searching...',
 			state:`${'\u{1F50D}'} ${srch_qry}`,

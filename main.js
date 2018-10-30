@@ -1,22 +1,26 @@
 const { app, BrowserWindow, Notification, NativeImage, Tray, ipcMain } = require('electron');
 const ytdl = require('ytdl-core');
 const RPC = require('discord-rpc');
-const client = new RPC.Client({ transport: 'ipc' })
+var client = new RPC.Client({ transport: 'ipc' })
 const config = require('./config.json');
-var startTimestamp = new Date();
+//var startTimestamp = new Date();
 var clientid = config.clientId;
 const pckg = require('./package.json')
-
+var isready = false
 
 // Window App //
 
 function createWindow(){
+	clientConnect();
 	win = new BrowserWindow({width:800, height:500, minWidth:400, minHeight:250, icon:`${__dirname}/img/ico.png`, transparent: true, frame:false, resizable:true});
 	win.setMenu(null);
 	win.loadFile(`${__dirname}/front_end/index.html`);
 	//win.openDevTools()
 	win.on('closed', () => {
 		win = null;
+	})
+	win.webContents.on('did-finish-load', () =>{
+		win.webContents.send('ready', true)
 	})
 	notifi = new Notification({title:`${pckg.productName}`, body:`Welcome to ${pckg.productName} v${pckg.version}!`, icon:`${__dirname}/img/ico.png`});
 	notifi.show()
@@ -50,22 +54,10 @@ app.on('activate', () =>{
 // Discord RPC Connection //
 
 ipcMain.on('activity', (event, arg) => {
-	client.setActivity(arg).catch(console.error)
-})
-
-client.on('ready', () => {
-	win.webContents.on('did-finish-load', () =>{
-		win.webContents.send('ready', true)
+	client.setActivity(arg).catch(e => {
+		clientConnect();
 	})
-	client.setActivity({
-		details:'Just idling...',
-		state:'and making some stuff',
-		startTimestamp,
-		largeImageKey:config.idle,
-		largeImageText: `YouTube Music v${pckg.version}`,
-		instance: false,
-	}).catch(console.error);
-});
+})
 
 function rpc_connect_notifi(fail){
 	if(!fail){
@@ -81,25 +73,33 @@ function rpc_connect_notifi(fail){
 		not.show()
 		setTimeout(() => {
 			not.close();
-		}, segs * 1000)
+		}, (segs - 1) * 1000)
 	}
 }
 
-client.login({ clientId: clientid })
-	.catch((e) => {
-		console.log(e);
-		let segs = 5
-		rpc_connect_notifi(true);
-		let logInterval = setInterval(() => {
-			client.login({ clientId: clientid })
-				.catch((e) => {
-					rpc_connect_notifi(true);
-				})
-				.then(() => {
+function clientConnect(){
+	let logInterval = setInterval(() => {
+		isready = true
+		client = new RPC.Client({ transport: 'ipc' })
+		client.login({ clientId: clientid })
+			.catch(e => {
+				//rpc_connect_notifi(true);
+				isready = false
+			}).then(() =>{
+				if(isready){
+					rpc_connect_notifi(false);
 					clearInterval(logInterval);
-				});
-		}, segs * 1000)
-	})
-	.then(() => {
-		rpc_connect_notifi(false);
-	})
+				}
+			})
+		client.on('ready', () => {
+			client.setActivity({
+				details:'Just idling...',
+				state:'and making some stuff',
+				largeImageKey:config.idle,
+				largeImageText: `YouTube Music v${pckg.version}`,
+				instance: false,
+			}).catch(console.error);
+		});
+		return;
+	}, 5 * 1000)
+}

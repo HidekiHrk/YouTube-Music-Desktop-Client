@@ -7,7 +7,7 @@ const client = new RPC.Client({ transport: 'ipc' })
 var previousPath = __dirname.slice(0, __dirname.length - __dirname.split(path.sep).pop().length)
 const config = require(previousPath + '/config.json');
 const pkg = require(previousPath + '/package.json')
-const startTimestamp = new Date()
+//const startTimestamp = new Date()
 var clientid = config.clientId;
 var isReady = false;
 var currentPlaying = null;
@@ -52,7 +52,7 @@ function notify(obj, timeout=5) {
 		}, timeout * 1000);
 	}
 	catch(e){}
-	try{		
+	try{
 		tray.displayBalloon({title:obj.title, content:obj.body, icon:obj.icon});
 	}
 	catch(e){}
@@ -62,6 +62,7 @@ function notify(obj, timeout=5) {
 
 ipcRenderer.on('ready', (event, arg) => {
 	isReady = arg;
+	//console.log(isReady)
 });
 
 // WebView Events //
@@ -75,19 +76,17 @@ webview.addEventListener('media-started-playing', () =>{
 			}
 			catch(e){}
 		`, { userGesture: true })
-
 	}
 	let ganzerozos = setInterval(() => {
 		if(is_playing){
 			is_playing = false
-			let newTimeStamp = new Date()
+			//let newTimeStamp = new Date()
 			notify({title:pkg.productName, body:`\u{1F3B5} ${currentPlaying.title}\n\u{1F464} ${currentPlaying.author}`, icon:previousPath + '/img/ico.png'})
 			tray.setToolTip(`Playing - Music: ${currentPlaying.title} - ${currentPlaying.author}`)
 			tray.setImage(previousPath + '/img/ico.png')
 			setActivity({
 				details:`\u{1F3B5} ${currentPlaying.title}`,
 				state:`\u{1F464} ${currentPlaying.author}`,
-				newTimeStamp,
 				largeImageKey:config.playing,
 				largeImageText: `YouTube Music v${pkg.version}`,
 				smallImageKey:config.play,
@@ -101,13 +100,12 @@ webview.addEventListener('media-started-playing', () =>{
 
 webview.addEventListener('media-paused', () => {
 	is_playing = true;
-	let newTimeStamp = new Date()
+	//let newTimeStamp = new Date()
 	tray.setToolTip(`Paused - Music: ${currentPlaying.title} - ${currentPlaying.author}`)
 	tray.setImage(previousPath + '/img/ico.png')
 	setActivity({
 		details:`\u{1F3B5} ${currentPlaying.title}`,
 		state:`\u{1F464} ${currentPlaying.author}`,
-		newTimeStamp,
 		largeImageKey:config.playing,
 		largeImageText: `YouTube Music v${pkg.version}`,
 		smallImageKey:config.pause,
@@ -118,7 +116,7 @@ webview.addEventListener('media-paused', () => {
 
 webview.addEventListener('did-stop-loading', () => {
 	let url = webview.getURL()
-	let newTimeStamp = new Date()
+	//let newTimeStamp = new Date()
 	if(url.startsWith('https://music.youtube.com/search?q=')){
 		if(!isReady){ return; }
 		webview.getWebContents().executeJavaScript(`
@@ -135,7 +133,6 @@ webview.addEventListener('did-stop-loading', () => {
 		setActivity({
 			details:'Searching...',
 			state:`${'\u{1F50D}'} ${srch_qry}`,
-			newTimeStamp,
 			largeImageKey:config.idle,
 			largeImageText: `YouTube Music v${pkg.version}`,
 			smallImageKey:config.search,
@@ -163,13 +160,12 @@ webview.addEventListener('did-stop-loading', () => {
 		setActivity({
 			details:'Just idling...',
 			state:'and making some stuff',
-			startTimestamp,
 			largeImageKey:config.idle,
 			largeImageText: `YouTube Music v${pkg.version}`,
 			instance: false,
 		})
 	}
-	console.log(url);
+	//console.log(url);
 });
 
 // Control Function //

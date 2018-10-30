@@ -27,7 +27,8 @@ div#back {
 	margin: 0;
 	top:0;
 	left:0;
-	z-index: -1;
+	border-radius: 8px;
+	overflow: hidden;
 }
 
 p#ytmsc_title {

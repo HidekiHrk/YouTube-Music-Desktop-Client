@@ -41,6 +41,9 @@ p#ytmsc_title {
 	padding: 0;
 	margin: 0;
 	font-weight: bold;
+	-webkit-user-select: none;
+	-webkit-user-drag: none;
+	-webkit-app-region: drag;
 }
 p#ytmsc_title img {
 	width: 18px;
@@ -49,6 +52,9 @@ p#ytmsc_title img {
 	padding: 0;
 	position: relative;
 	top:2px;
+	-webkit-user-select: none;
+	-webkit-user-drag: none;
+	-webkit-app-region: drag;
 }
 
 #webview {

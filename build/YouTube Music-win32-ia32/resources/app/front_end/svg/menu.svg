@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-492 -838 13 12">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #fff;
+      }
+    </style>
+  </defs>
+  <g id="menu" transform="translate(-496 -842)">
+    <rect id="bottom" class="cls-1" width="13" height="2" rx="1" transform="translate(4 14)"/>
+    <rect id="middle" class="cls-1" width="13" height="2" rx="1" transform="translate(4 9)"/>
+    <rect id="top" class="cls-1" width="13" height="2" rx="1" transform="translate(4 4)"/>
+  </g>
+</svg>

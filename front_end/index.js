@@ -50,6 +50,7 @@ function notify(obj, timeout=5) {
 		setTimeout(() => {
 			not.close();
 		}, timeout * 1000);
+	}
 	catch(e){}
 	try{		
 		tray.displayBalloon({title:obj.title, content:obj.body, icon:obj.icon});

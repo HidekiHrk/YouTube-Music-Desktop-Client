@@ -33,10 +33,11 @@ var is_playing = false;
 	return String.fromCharCode(str.charCodeAt(idx));
 }*/
 
-function video_info(url, title, author) {
+function video_info(url, title, author, thumbnail) {
 	this.url = url;
 	this.title = title;
 	this.author = author;
+	this.thumbnail = thumbnail;
 }
 
 function setActivity(obj){
@@ -77,7 +78,7 @@ webview.addEventListener('media-started-playing', () =>{
 			catch(e){}
 		`, { userGesture: true })
 	}
-	let ganzerozos = setInterval(() => {
+	let playingInterval = setInterval(() => {
 		if(is_playing){
 			is_playing = false
 			//let newTimeStamp = new Date()
@@ -93,7 +94,7 @@ webview.addEventListener('media-started-playing', () =>{
 				smallImageText: 'Playing',
 				instance: false,
 			})
-			clearInterval(ganzerozos);
+			clearInterval(playingInterval);
 		}
 	}, 300)
 })
@@ -117,54 +118,73 @@ webview.addEventListener('media-paused', () => {
 webview.addEventListener('did-stop-loading', () => {
 	let url = webview.getURL()
 	//let newTimeStamp = new Date()
-	if(url.startsWith('https://music.youtube.com/search?q=')){
-		if(!isReady){ return; }
-		webview.getWebContents().executeJavaScript(`
-			try{
-				let video = document.getElementsByClassName('video-stream html5-main-video');
-				video[0].pause();
-			}
-			catch(e){}
-		`, { userGesture:true })
-		in_search = true;
-		let srch_qry = decodeURI(url.slice('https://music.youtube.com/search?q='.length, url.length)).replace(/\+/g, ' ');
-		tray.setToolTip(`Searching: ${srch_qry}`)
-		tray.setImage(previousPath + '/img/icon2.png')
-		setActivity({
-			details:'Searching...',
-			state:`${'\u{1F50D}'} ${srch_qry}`,
-			largeImageKey:config.idle,
-			largeImageText: `YouTube Music v${pkg.version}`,
-			smallImageKey:config.search,
-			smallImageText: 'Searching',
-			instance: false,
-		});
-	}
-	else if(url.startsWith('https://music.youtube.com/watch?v=')){
-		if(!isReady){ return; }
-		let new_url = 'https://www.youtube.com/watch?v=' + url.slice('https://music.youtube.com/watch?v='.length, url.length)
-		ytdl.getInfo(new_url, (err, info) => {
-			currentPlaying = new video_info(url, info.title, info.author.name)
-			is_playing = true;
+	switch(true){
+		case url.startsWith('https://music.youtube.com/search?q='):
+			if(!isReady){ return; }
 			webview.getWebContents().executeJavaScript(`
-			try{
-				let video = document.getElementsByClassName('video-stream html5-main-video');
-				video[0].play();
-			}
-			catch(e){}
+				try{
+					let video = document.getElementsByClassName('video-stream html5-main-video');
+					video[0].pause();
+				}
+				catch(e){}
 			`, { userGesture:true })
-		});
-	}
-	else{
-		if(!isReady){ return; }
-		setActivity({
-			details:'Just idling...',
-			state:'and making some stuff',
-			largeImageKey:config.idle,
-			largeImageText: `YouTube Music v${pkg.version}`,
-			instance: false,
-		})
-	}
+			in_search = true;
+			let srch_qry = decodeURI(url.slice('https://music.youtube.com/search?q='.length, url.length)).replace(/\+/g, ' ');
+			tray.setToolTip(`Searching: ${srch_qry}`)
+			tray.setImage(previousPath + '/img/icon2.png')
+			setActivity({
+				details:'Searching...',
+				state:`${'\u{1F50D}'} ${srch_qry}`,
+				largeImageKey:config.idle,
+				largeImageText: `YouTube Music v${pkg.version}`,
+				smallImageKey:config.search,
+				smallImageText: 'Searching',
+				instance: false,
+			});
+			break;
+		case url.startsWith('https://music.youtube.com/watch?v='):
+			if(!isReady){ return; }
+			let new_url = 'https://www.youtube.com/watch?v=' + url.slice('https://music.youtube.com/watch?v='.length, url.length)
+			ytdl.getInfo(new_url, (err, info) => {
+				currentPlaying = new video_info(url, info.title, info.author.name, info.thumbnail_url)
+				is_playing = true;
+				webview.getWebContents().executeJavaScript(`
+				try{
+					let video = document.getElementsByClassName('video-stream html5-main-video');
+					video[0].play();
+				}
+				catch(e){}
+				`, { userGesture:true })
+			});
+			break;
+		case url.startsWith('https://music.youtube.com/playlist?list='):
+			if(!isReady){ return; }
+			webview.getWebContents().executeJavaScript(`
+				try{
+					let video = document.getElementsByClassName('video-stream html5-main-video');
+					video[0].pause();
+				}
+				catch(e){}
+			`, { userGesture:true })
+			break;
+		default:
+			if(!isReady){ return; }
+			/*webview.getWebContents().executeJavaScript(`
+				try{
+					let video = document.getElementsByClassName('video-stream html5-main-video');
+					video[0].pause();
+				}
+				catch(e){}
+			`, { userGesture:true })*/
+			setActivity({
+				details:'Just idling...',
+				state:'and making some stuff',
+				largeImageKey:config.idle,
+				largeImageText: `YouTube Music v${pkg.version}`,
+				instance: false,
+			})
+			break;
+		}
 	//console.log(url);
 });
 

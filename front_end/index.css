@@ -84,7 +84,7 @@ div#control {
 .rightcontrol {
 	width: 30px;
 	filter: brightness(1);
-	transition: filter 0.2s ease;
+	/*transition: filter 0.2s ease;*/
 	display: block;
 	position: absolute;
 	top: 0px;
@@ -117,7 +117,7 @@ button.botoes {
 }
 img.butoes {
 	filter: brightness(1);
-	transition: filter 0.2s ease;
+	/*transition: filter 0.2s ease;*/
 }
 .botoes:hover > img.butoes {
 	filter: brightness(0.2);

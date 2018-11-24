@@ -26,7 +26,7 @@ function createWindow(){
 	notifi.show()
 	notifi.on('show', () => {
 		try{
-				setTimeout(function(){
+			setTimeout(function(){
 				notifi.close();
 			}, 10000)
 		}
@@ -54,9 +54,8 @@ app.on('activate', () =>{
 // Discord RPC Connection //
 
 ipcMain.on('activity', (event, arg) => {
-	client.setActivity(arg).catch(e => {
-		clientConnect();
-	})
+	client.setActivity(arg)
+		.catch(console.error)
 })
 
 function rpc_connect_notifi(fail){
@@ -79,6 +78,7 @@ function rpc_connect_notifi(fail){
 
 function clientConnect(){
 	let logInterval = setInterval(() => {
+		console.log('trying to connect')
 		isready = true
 		client = new RPC.Client({ transport: 'ipc' })
 		client.login({ clientId: clientid })
@@ -99,6 +99,9 @@ function clientConnect(){
 				largeImageText: `YouTube Music v${pckg.version}`,
 				instance: false,
 			}).catch(console.error);
+		});
+		client.on('disconnect', () => {
+			clientConnect();
 		});
 		return;
 	}, 5 * 1000)

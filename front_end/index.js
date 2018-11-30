@@ -44,13 +44,18 @@ function setActivity(obj){
 	ipcRenderer.send('activity', obj);
 }
 
-function notify(obj, timeout=5) {
+function notify(obj, timeout=5, click=true) {
 	try{
 		let not = new remote.Notification(obj);
 		not.show()
 		setTimeout(() => {
 			not.close();
 		}, timeout * 1000);
+		if(click){
+			not.on('click', () => {
+				remote.getCurrentWindow().show();
+			})
+		}
 	}
 	catch(e){}
 	try{
@@ -58,6 +63,10 @@ function notify(obj, timeout=5) {
 	}
 	catch(e){}
 }
+
+ipcRenderer.on('notify', (event, arg) =>{
+	notify(...arg);
+})
 
 // ipcEvents //
 
@@ -169,13 +178,13 @@ webview.addEventListener('did-stop-loading', () => {
 			break;
 		default:
 			if(!isReady){ return; }
-			/*webview.getWebContents().executeJavaScript(`
+			webview.getWebContents().executeJavaScript(`
 				try{
 					let video = document.getElementsByClassName('video-stream html5-main-video');
 					video[0].pause();
 				}
 				catch(e){}
-			`, { userGesture:true })*/
+			`, { userGesture:true })
 			setActivity({
 				details:'Just idling...',
 				state:'and making some stuff',

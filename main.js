@@ -1,11 +1,48 @@
+// imports //
 const { app, BrowserWindow, Notification, NativeImage, Tray, ipcMain } = require('electron');
 const RPC = require('discord-rpc');
-var client = new RPC.Client({ transport: 'ipc' })
+const os = require('os');
+const fs = require('fs');
+
+// vars //
+var client = new RPC.Client({ transport: 'ipc' });
 const config = require('./config.json');
 //var startTimestamp = new Date();
 var clientid = config.clientId;
-const pckg = require('./package.json')
+const pckg = require('./package.json');
 var rpcState = false;
+
+function userConfig(method='get', data={}, filename='.ytmConfig.json'){
+	let user_config;
+	switch(process.platform){
+		case 'linux':
+			user_config = `${os.homedir}/.YTMusicFiles`;
+			break;
+		case 'win32':
+			user_config = `%AppData%/YTMusicFiles`;
+			break;
+		default:
+			return null;
+	}
+	if(!fs.existsSync(user_config)){fs.mkdirSync(user_config);}
+	if(!fs.existsSync(`${user_config}/${filename}`)){
+		fs.writeFileSync(`${user_config}/${filename}`, '{}')}
+	if(method == 'post'){
+		fs.writeFileSync(`${user_config}/${filename}`,
+			JSON.stringify(data, null, 4)
+		); return data;
+	}
+	else if(method == 'get'){
+		return JSON.parse(fs.readFileSync(`${user_config}/${filename}`).toString());
+	}
+}
+var user_config = userConfig();
+if(Object.keys(user_config).length == 0){
+	userConfig('post', {
+		"rich_presence":true,
+		"minimize":true
+	})
+}
 
 
 //Util Functions//
@@ -56,15 +93,6 @@ client.on('ready', () => {
 		largeImageText: 'three',
 		instance: false
 	})
-	setInterval(() => {
-		client.setActivity({
-			details: `Idlinga...`,
-			state: 'Just Started...',
-			largeImageKey: config.idle,
-			largeImageText: 'three',
-			instance: false
-		})
-	}, 3000)
 });
 
 

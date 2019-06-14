@@ -6,7 +6,7 @@
   "productName": "YouTube Music",
   "scripts": {
     "start": "electron . --enable-transparent-visuals --disable-gpu",
-    "test": "electron-packager . --icon=./img/icon.ico"
+    "test": "electron-packager . --icon=./img/icon.ico --asar"
   },
   "author": "Hideki",
   "license": "ISC",

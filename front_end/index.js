@@ -1,25 +1,42 @@
 const { remote, ipcRenderer } = require('electron');
 const fs = require('fs');
-const ytdl = require('ytdl-core');
-const RPC = require('discord-rpc');
+const ytRequest = require('./ytRequest.js');
+const userConfig = require('../userConfigWrapper.js');
 const path = require('path');
-const client = new RPC.Client({ transport: 'ipc' })
 var previousPath = __dirname.slice(0, __dirname.length - __dirname.split(path.sep).pop().length)
 const config = require(previousPath + '/config.json');
 const pkg = require(previousPath + '/package.json')
-//const startTimestamp = new Date()
-var clientid = config.clientId;
 var isReady = false;
 var currentPlaying = null;
 var webView = document.getElementById('webview');
 
 // Icon in Task Bar //
 
-var tray = new remote.Tray(previousPath + '/img/icon2.png');
-tray.setToolTip('Idling...');
-tray.on('click', () => {
-	remote.getCurrentWindow().show();
-})
+var tray = new remote.Tray(previousPath + '/img/icon1.png');
+function trayConfig(t){
+	t.setToolTip('Idling...');
+	t.on('click', () => {
+		remote.getCurrentWindow().show();
+	})
+	// Tray context menu //
+	var menu = new remote.Menu.buildFromTemplate(
+		[
+			new remote.MenuItem({
+				label:"Open YouTube Music", click: () => {
+					remote.getCurrentWindow().show();
+				}, icon: previousPath + '/img/icon1.png',
+			}),
+			new remote.MenuItem({
+				label:"Quit YouTube Music", click: () => {
+					remote.getCurrentWindow().destroy();
+				}, icon: previousPath + '/img/close_icon.png',
+			}),
+		]
+	);
+	
+	t.setContextMenu(menu);
+}
+trayConfig(tray);
 
 // Globals //
 

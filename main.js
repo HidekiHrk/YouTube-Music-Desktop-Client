@@ -1,8 +1,13 @@
 // imports //
-const { app, BrowserWindow, Notification, NativeImage, Tray, ipcMain } = require('electron');
+const { 
+	app, BrowserWindow,
+	Notification, NativeImage, Tray,
+	ipcMain, Menu, MenuItem } = require('electron');
 const RPC = require('discord-rpc');
 const os = require('os');
 const fs = require('fs');
+const userConfig = require('./userConfigWrapper');
+const ytReq = require('./front_end/ytRequest');
 
 // vars //
 var client = new RPC.Client({ transport: 'ipc' });
@@ -11,45 +16,43 @@ const config = require('./config.json');
 var clientid = config.clientId;
 const pckg = require('./package.json');
 var rpcState = false;
+var userClose = true;
 
-function userConfig(method='get', data={}, filename='.ytmConfig.json'){
-	let user_config;
-	switch(process.platform){
-		case 'linux':
-			user_config = `${os.homedir}/.YTMusicFiles`;
-			break;
-		case 'win32':
-			user_config = `%AppData%/YTMusicFiles`;
-			break;
-		default:
-			return null;
-	}
-	if(!fs.existsSync(user_config)){fs.mkdirSync(user_config);}
-	if(!fs.existsSync(`${user_config}/${filename}`)){
-		fs.writeFileSync(`${user_config}/${filename}`, '{}')}
-	if(method == 'post'){
-		fs.writeFileSync(`${user_config}/${filename}`,
-			JSON.stringify(data, null, 4)
-		); return data;
-	}
-	else if(method == 'get'){
-		return JSON.parse(fs.readFileSync(`${user_config}/${filename}`).toString());
-	}
-}
-var user_config = userConfig();
-if(Object.keys(user_config).length == 0){
+// UserConfig Set //
+if(Object.keys(userConfig()).length == 0){
 	userConfig('post', {
 		"rich_presence":true,
-		"minimize":true
+		"minimize":true,
+		"notifications":true
 	})
 }
-
 
 //Util Functions//
 
 function notify(obj, timeout=5, click=false){
 	if(renderer_on){
 		win.webContents.send('notify', [obj, timeout, click])
+	}
+}
+
+var notification_sys = {
+	notify_number:0,
+	notify: (music_name, music_author, music_thumb) => {
+		let notifyWindow = new BrowserWindow(
+			{	width:350, height:130, 
+				resizable:false, maximizable:false, transparent: true, frame:false
+			}
+		)
+		notifyWindow.setMenu(null);
+		notifyWindow.loadFile(`${__dirname}/front_end/notifications/notification.html`);
+		// notifyWindow.openDevTools();
+		notifyWindow.webContents.on('did-finish-load', () => {
+			notifyWindow.webContents.send('notify', {
+				name:music_name, author:music_author,
+				thumbnail:music_thumb
+			})
+		})
+		notifyWindow.on('closed', () => {notifyWindow = null;});
 	}
 }
 
@@ -60,8 +63,22 @@ function createWindow(){
 	win.setMenu(null);
 	win.loadFile(`${__dirname}/front_end/index.html`);
 	//win.openDevTools()
+	let aa = ytReq.getVideoInfo('https://www.youtube.com/watch?v=ObpAQ1kPizk')
+		.then(v => {
+			notification_sys.notify(
+				v.title, v.author, v.thumb
+			)
+			console.log(v.thumb)
+		});
+	win.on('close', e =>{
+		if(userConfig().minimize){
+			e.preventDefault();
+			win.hide();
+		}
+	});
 	win.on('closed', () => {
 		win = null;
+		app.quit();
 	})
 }
 
@@ -94,7 +111,5 @@ client.on('ready', () => {
 		instance: false
 	})
 });
-
-
 
 client.login({ clientId: clientid });

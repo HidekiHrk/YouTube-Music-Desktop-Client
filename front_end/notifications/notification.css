@@ -1,0 +1,91 @@
+html {
+    padding: 0;
+    margin: 0;
+}
+
+body {
+    padding: 0;
+    margin: 0;
+    width: 350px;
+    height: 130px;
+}
+
+body * {
+    user-select: none;
+}
+
+@font-face {
+    font-family: "Futura_Light";
+    src: url('../fonts/Futura_Light.ttf');
+}
+
+div#main_block {
+    background: linear-gradient(#222, #111);
+    width: 350px;
+    height: 130px;
+    border-radius: 10px;
+    padding: 0;
+    margin: 0;
+    display: block;
+    position: absolute;
+}
+
+div#main_block p, marquee {
+    font-family: 'Futura_Light';
+    display: block;
+    position: absolute;
+    color: black;
+    background: linear-gradient(
+        to right,
+        rgba(255,255,255,0.5),
+        rgba(255,255,255,0.8),
+        rgba(255,255,255,0.8),
+        rgba(255,255,255,0.5)
+    );
+    border-radius: 3px;
+    font-weight: bold;
+    font-size: 17px;
+    padding: 3px;
+    padding-bottom: 0;
+    margin:0;
+    /* top: 18px; */
+    left: 140px;
+    width: 189px;
+    height: 21px;
+    overflow: hidden;
+}
+
+#name {
+    top: 18px;
+}
+#author {
+    top: 58px;
+}
+
+img.icon {
+    height: 18px;
+    display: block;
+    padding: 0;
+    margin: 0;
+    position: absolute;
+    left: 120px;
+}
+
+img#music_icon {
+    top: 21px;
+}
+
+img#author_icon {
+    top: 61px;
+}
+
+img#thumbnail {
+    width: 100px;
+    height: 100px;
+    border-radius: 10px;
+    padding: 0;
+    margin-top: 15px;
+    margin-left: 15px;
+    display: block;
+    position: absolute;
+}

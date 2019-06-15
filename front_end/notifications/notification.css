@@ -88,4 +88,5 @@ img#thumbnail {
     margin-left: 15px;
     display: block;
     position: absolute;
+    -webkit-user-drag: none;
 }

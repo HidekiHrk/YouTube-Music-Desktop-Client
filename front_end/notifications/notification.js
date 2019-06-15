@@ -10,16 +10,15 @@ function convert(element, to){
 function transformTexts(text_arr){
     text_arr.forEach(el => {
         el_obj = document.getElementById(el);
-        if(el_obj.scrollWidth > el_obj.offsetWidth){
+        if(el_obj.scrollWidth > el_obj.offsetWidth ||
+            el_obj.scrollHeight > el_obj.offsetHeight + 4){
             convert(el_obj, 'marquee');
         }
     });
 }
 
-function change_name(querysel, newname){
-    document.querySelectorAll(querysel).forEach(el => {
-        el.innerHTML = newname;
-    })
+function change_name(textid, newname){
+    document.getElementById(textid).innerHTML = newname;
 }
 
 function change_thumb(uri){
@@ -27,8 +26,8 @@ function change_thumb(uri){
 }
 
 ipcRenderer.on('notify', (event, arg) => {
-    change_name('#name', arg.name);
-    change_name('#author', arg.author);
+    change_name('name', arg.name);
+    change_name('author', arg.author);
     change_thumb(arg.thumbnail);
     transformTexts(['name', 'author']);
 })

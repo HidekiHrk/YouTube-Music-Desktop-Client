@@ -61,29 +61,9 @@ function setActivity(obj){
 	ipcRenderer.send('activity', obj);
 }
 
-function notify(obj, timeout=5, click=true) {
-	try{
-		let not = new remote.Notification(obj);
-		not.show()
-		setTimeout(() => {
-			not.close();
-		}, timeout * 1000);
-		if(click){
-			not.on('click', () => {
-				remote.getCurrentWindow().show();
-			})
-		}
-	}
-	catch(e){}
-	try{
-		tray.displayBalloon({title:obj.title, content:obj.body, icon:obj.icon});
-	}
-	catch(e){}
+function notify(name, author, thumb) {
+	ipcRenderer.send('notify', {name, author, thumb})
 }
-
-ipcRenderer.on('notify', (event, arg) =>{
-	notify(...arg);
-})
 
 // ipcEvents //
 
@@ -108,8 +88,7 @@ webview.addEventListener('media-started-playing', () =>{
 		if(is_playing){
 			is_playing = false
 			//let newTimeStamp = new Date()
-			notify({title:pkg.productName, body:`\u{1F3B5} ${currentPlaying.title}\n\u{1F464} ${currentPlaying.author}`, icon:previousPath + '/img/ico.png'})
-			tray.setToolTip(`Playing - Music: ${currentPlaying.title} - ${currentPlaying.author}`)
+			notify()
 			tray.setImage(previousPath + '/img/ico.png')
 			setActivity({
 				details:`\u{1F3B5} ${currentPlaying.title}`,

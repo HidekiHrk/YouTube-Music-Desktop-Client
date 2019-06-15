@@ -23,10 +23,11 @@ function getVideoAuthor(bodyStr){
 
 function getVideoId(bodyStr){
     // let idReg = /<meta itemprop="videoId" content=".*">/
-    let idReg = /video-id=".*" /
+    let idReg = /'VIDEO_ID': ".*",/
     if(idReg.test(bodyStr)){
         let bstr = idReg.exec(bodyStr).toString();
-        bstr = bstr.slice(34, -2);
+        //bstr = bstr.slice(34, -2);
+        bstr = bstr.trim().slice(13, -2);
         return bstr;
     }
     return null;

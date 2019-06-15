@@ -1,8 +1,9 @@
 // imports //
+const electron = require('electron');
 const { 
 	app, BrowserWindow,
 	Notification, NativeImage, Tray,
-	ipcMain, Menu, MenuItem } = require('electron');
+	ipcMain, Menu, MenuItem } = electron;
 const RPC = require('discord-rpc');
 const os = require('os');
 const fs = require('fs');
@@ -16,33 +17,46 @@ const config = require('./config.json');
 var clientid = config.clientId;
 const pckg = require('./package.json');
 var rpcState = false;
-var userClose = true;
 
 // UserConfig Set //
 if(Object.keys(userConfig()).length == 0){
 	userConfig('post', {
 		"rich_presence":true,
 		"minimize":true,
-		"notifications":true
+		"notifications":true,
+		"notification_pos":"top"
 	})
 }
 
 //Util Functions//
 
-function notify(obj, timeout=5, click=false){
-	if(renderer_on){
-		win.webContents.send('notify', [obj, timeout, click])
+function getNotPos(wW, wH, nC){
+	let x = wW - 350;
+	let y;
+	switch(userConfig().notification_pos){
+		case 'top':
+			y = (130 * nC) + (nC > 0 ? 30 : 0);
+			break;
+		case 'bot':
+			y = (wH - 130) - ((130 * nC) + (nC > 0 ? 10 : 0));
+			break;
 	}
+	return {x,y};
 }
 
-var notification_sys = {
-	notify_number:0,
-	notify: (music_name, music_author, music_thumb) => {
+var n_sys = {
+	notify_count:0,
+	notify: (music_name, music_author, music_thumb, timeout=5000) => {
+		let workarea = electron.screen.getPrimaryDisplay().workAreaSize;
+		let pos = getNotPos(workarea.width, workarea.height, n_sys.notify_count);
 		let notifyWindow = new BrowserWindow(
-			{	width:350, height:130, 
+			{	
+				x:pos.x, y:pos.y,
+				width:350, height:130, alwaysOnTop:true,skipTaskbar:true,
 				resizable:false, maximizable:false, transparent: true, frame:false
 			}
 		)
+		n_sys.notify_count += 1;
 		notifyWindow.setMenu(null);
 		notifyWindow.loadFile(`${__dirname}/front_end/notifications/notification.html`);
 		// notifyWindow.openDevTools();
@@ -51,8 +65,12 @@ var notification_sys = {
 				name:music_name, author:music_author,
 				thumbnail:music_thumb
 			})
+			setTimeout(() => {notifyWindow.destroy()}, timeout);
 		})
-		notifyWindow.on('closed', () => {notifyWindow = null;});
+		notifyWindow.on('closed', () => {notifyWindow = null;
+			if(n_sys.notify_count)
+				n_sys.notify_count -= 1;
+		});
 	}
 }
 
@@ -63,13 +81,6 @@ function createWindow(){
 	win.setMenu(null);
 	win.loadFile(`${__dirname}/front_end/index.html`);
 	//win.openDevTools()
-	let aa = ytReq.getVideoInfo('https://www.youtube.com/watch?v=ObpAQ1kPizk')
-		.then(v => {
-			notification_sys.notify(
-				v.title, v.author, v.thumb
-			)
-			console.log(v.thumb)
-		});
 	win.on('close', e =>{
 		if(userConfig().minimize){
 			e.preventDefault();
@@ -92,6 +103,11 @@ app.on('activate', () =>{
 	if(win === null){
 		createWindow()
 	};
+})
+
+// app listeners //
+ipcMain.on('notify', (event, arg) => {
+	n_sys.notify(arg.name, arg.author, arg.thumb)
 })
 
 // Discord RPC Connection //
